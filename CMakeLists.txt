@@ -11,11 +11,11 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
     ${CMAKE_BINARY_DIR}
-    /usr/local/include/tesseract
+    /usr/include/tesseract
 )
 
 link_directories(
-    /usr/local/lib
+    /usr/lib
     ${QT_LIBRARY_DIR}
 )
 

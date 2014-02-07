@@ -1,7 +1,10 @@
 #include "TesseractTrainer.h"
 #include "ui_TesseractTrainer.h"
+#include "baseapi.h"
+#include "strngs.h"
+#include <iostream>
 
-TesseractTrainer::TesseractTrainer(QWidget *parent) :
+TesseractTrainer::TesseractTrainer(int argc, char *argv[], QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::TesseractTrainer)
 {

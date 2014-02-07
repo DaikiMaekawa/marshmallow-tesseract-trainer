@@ -12,7 +12,7 @@ class TesseractTrainer : public QMainWindow
     Q_OBJECT
     
 public:
-    explicit TesseractTrainer(QWidget *parent = 0);
+    explicit TesseractTrainer(int argc, char *argv[], QWidget *parent = 0);
     ~TesseractTrainer();
     
 private:
