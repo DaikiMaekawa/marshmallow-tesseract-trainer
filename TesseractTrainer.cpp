@@ -4,7 +4,7 @@
 * @file TesseractTrainer.cpp
 * @brief tesseract trainer gui
 * @author Daiki Maekawa
-* @date 2012-09-10
+* @date 2014-02-07
 *******************************************************************/ 
 
 #include "TesseractTrainer.h"
@@ -13,6 +13,12 @@
 #include "strngs.h"
 #include <iostream>
 #include <cassert>
+#include <QTextStream>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QIODevice>
+
+static const char * const SETTING_FILE_NAME = ".tesseracttrainerrc";
 
 TesseractTrainer::TesseractTrainer(int argc, char *argv[], QWidget *parent) :
     QMainWindow(parent),
@@ -20,6 +26,7 @@ TesseractTrainer::TesseractTrainer(int argc, char *argv[], QWidget *parent) :
 {
     m_ui->setupUi(this);
     connectSignals();
+    loadSettings();
 }
 
 void TesseractTrainer::connectSignals(){
@@ -30,16 +37,36 @@ void TesseractTrainer::connectSignals(){
     assert(ret);
 }
 
+void TesseractTrainer::loadSettings(){
+
+    QFile file(QDir::homePath() + "/" + QString(SETTING_FILE_NAME));
+    if(file.open(QIODevice::ReadOnly)){
+        QTextStream stream(&file);
+        m_imgDir = stream.readLine(1024);
+    }
+}
+
+void TesseractTrainer::saveSettings(){
+    QFile file(QDir::homePath() + "/" + QString(SETTING_FILE_NAME));
+    if(file.open(QIODevice::WriteOnly)){
+        file.write(m_imgDir.toLocal8Bit());
+        file.write("\n");
+    }
+}
+
 void TesseractTrainer::onLoadImage(){
-    std::cout << "load" << std::endl;
+    QString file = QFileDialog::getOpenFileName(this, "Open File", m_imgDir, "Image File(*)");
+    m_imgDir = file;
 }
 
 void TesseractTrainer::onSaveLang(){
     std::cout << "save" << std::endl;
+    
 }
 
 TesseractTrainer::~TesseractTrainer()
 {
+    saveSettings();
     delete m_ui;
 }
 

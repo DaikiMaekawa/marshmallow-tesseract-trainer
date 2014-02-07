@@ -2,6 +2,7 @@
 #define TESSERACTTRAINER_H
 
 #include <QMainWindow>
+#include <QString>
 
 namespace Ui {
 class TesseractTrainer;
@@ -17,7 +18,10 @@ public:
     
 private:
     Ui::TesseractTrainer *m_ui;
+    QString m_imgDir;
     void connectSignals();
+    void saveSettings();
+    void loadSettings();
 
 public slots:
     void onLoadImage();
