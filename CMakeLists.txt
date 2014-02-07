@@ -11,9 +11,11 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${PROJECT_BINARY_DIR}
     ${CMAKE_BINARY_DIR}
+    /usr/local/include/tesseract
 )
 
 link_directories(
+    /usr/local/lib
     ${QT_LIBRARY_DIR}
 )
 
@@ -51,5 +53,7 @@ add_executable(MarshmallowTesseractTrainer WIN32
 
 target_link_libraries(MarshmallowTesseractTrainer
     ${QT_LIBRARIES}
+    lept
+    tesseract
 )
 
