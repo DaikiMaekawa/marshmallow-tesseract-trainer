@@ -16,7 +16,12 @@ public:
     ~TesseractTrainer();
     
 private:
-    Ui::TesseractTrainer *ui;
+    Ui::TesseractTrainer *m_ui;
+    void connectSignals();
+
+public slots:
+    void onLoadImage();
+    void onSaveLang();
 };
 
 #endif // TESSERACTTRAINER_H
