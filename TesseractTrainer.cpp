@@ -2,7 +2,7 @@
 * Copyright (c) 2014 Daiki Maekawa
 *
 * @file TesseractTrainer.cpp
-* @brief lang
+* @brief tesseract trainer gui
 * @author Daiki Maekawa
 * @date 2012-09-10
 *******************************************************************/ 
@@ -12,6 +12,7 @@
 #include "baseapi.h"
 #include "strngs.h"
 #include <iostream>
+#include <cassert>
 
 TesseractTrainer::TesseractTrainer(int argc, char *argv[], QWidget *parent) :
     QMainWindow(parent),
@@ -24,9 +25,9 @@ TesseractTrainer::TesseractTrainer(int argc, char *argv[], QWidget *parent) :
 void TesseractTrainer::connectSignals(){
     bool ret;
     ret = connect(m_ui->actionLoad, SIGNAL(triggered()), this, SLOT(onLoadImage()));
-    //assert(ret);
+    assert(ret);
     ret = connect(m_ui->actionSave, SIGNAL(triggered()), this, SLOT(onSaveLang()));
-    //assert(ret);
+    assert(ret);
 }
 
 void TesseractTrainer::onLoadImage(){
