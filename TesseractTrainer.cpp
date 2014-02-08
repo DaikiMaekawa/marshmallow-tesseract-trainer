@@ -9,8 +9,6 @@
 
 #include "TesseractTrainer.h"
 #include "ui_TesseractTrainer.h"
-#include "baseapi.h"
-#include "strngs.h"
 #include <iostream>
 #include <cassert>
 #include <QTextStream>
@@ -20,7 +18,6 @@
 #include <QImage>
 
 static const char * const SETTING_FILE_NAME = ".tesseracttrainerrc";
-
 TesseractTrainer::TesseractTrainer(int argc, char *argv[], QWidget *parent) :
     QMainWindow(parent),
     m_ui(new Ui::TesseractTrainer)
@@ -60,6 +57,8 @@ void TesseractTrainer::onLoadImage(){
     m_imgDir = file;
     QImage img(file);
     m_ui->labelImg->setPixmap(QPixmap::fromImage(img));
+    QString boxes = m_tess.makeBoxes(img, 0);
+    std::cout << boxes.toStdString() << std::endl;
 }
 
 void TesseractTrainer::onSaveLang(){

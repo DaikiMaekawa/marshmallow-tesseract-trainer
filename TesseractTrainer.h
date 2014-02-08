@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QString>
+#include "QTesseract.h"
 
 namespace Ui {
 class TesseractTrainer;
@@ -13,12 +14,13 @@ class TesseractTrainer : public QMainWindow
     Q_OBJECT
     
 public:
-    explicit TesseractTrainer(int argc, char *argv[], QWidget *parent = 0);
+    TesseractTrainer(int argc, char *argv[], QWidget *parent = 0);
     ~TesseractTrainer();
     
 private:
     Ui::TesseractTrainer *m_ui;
     QString m_imgDir;
+    QTesseract m_tess;
     void connectSignals();
     void saveSettings();
     void loadSettings();

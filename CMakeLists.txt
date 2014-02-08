@@ -22,10 +22,12 @@ link_directories(
 set(TesseractTrainer_SRCS
     main.cpp
     TesseractTrainer.cpp
+    QTesseract.cpp
 )
 
 set(TesseractTrainer_HDRS
     TesseractTrainer.h
+    QTesseract.h
 )
 
 set(TesseractTrainer_UIS
