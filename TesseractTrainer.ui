@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QLabel" name="labelImage">
+     <widget class="QLabel" name="labelImg">
       <property name="text">
        <string>ImageArea</string>
       </property>

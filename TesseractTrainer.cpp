@@ -17,6 +17,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QIODevice>
+#include <QImage>
 
 static const char * const SETTING_FILE_NAME = ".tesseracttrainerrc";
 
@@ -57,6 +58,8 @@ void TesseractTrainer::saveSettings(){
 void TesseractTrainer::onLoadImage(){
     QString file = QFileDialog::getOpenFileName(this, "Open File", m_imgDir, "Image File(*)");
     m_imgDir = file;
+    QImage img(file);
+    m_ui->labelImg->setPixmap(QPixmap::fromImage(img));
 }
 
 void TesseractTrainer::onSaveLang(){
@@ -64,8 +67,7 @@ void TesseractTrainer::onSaveLang(){
     
 }
 
-TesseractTrainer::~TesseractTrainer()
-{
+TesseractTrainer::~TesseractTrainer(){
     saveSettings();
     delete m_ui;
 }
