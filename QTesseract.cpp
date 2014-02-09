@@ -103,7 +103,7 @@ QString QTesseract::getUnicharset(const QVector<QString> &boxes){
 
             unicharset.unichar_insert(unichar_string.string());
             std::cout << "unichar = " << unichar_string.string() << std::endl;
-            //set_properties(&unicharset, unichar_string.string());
+            //setProperties(&unicharset, unichar_string.string());
         }
     }
 
@@ -113,7 +113,7 @@ QString QTesseract::getUnicharset(const QVector<QString> &boxes){
         std::cout << "bad" << std::endl;
     }
 
-    return QString("");
+    return QString(""); //TODO: Implemented
 }
 
 PIX* QTesseract::qImage2PIX(const QImage &qImage){
