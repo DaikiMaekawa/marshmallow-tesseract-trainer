@@ -57,8 +57,11 @@ void TesseractTrainer::onLoadImage(){
     m_imgDir = file;
     QImage img(file);
     m_ui->labelImg->setPixmap(QPixmap::fromImage(img));
-    QString boxes = m_tess.makeBoxes(img, 0);
+    QString boxes = m_tess.getBoxes(img, 0);
     std::cout << boxes.toStdString() << std::endl;
+    QVector<QString> boxes_list;
+    boxes_list << boxes;
+    m_tess.getUnicharset(boxes_list);
 }
 
 void TesseractTrainer::onSaveLang(){

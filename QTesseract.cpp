@@ -2,6 +2,10 @@
 #include <QSettings>
 #include <QApplication>
 #include <QMessageBox>
+#include <QTextStream>
+#include "rect.h"
+#include "boxread.h"
+#include <iostream>
 
 static const char * const SETTING_ORGANIZATION_NAME = "marshmallow-tesseract-trainer";
 static const char * const SETTING_APP_NAME = "MarshmallowTesseractTrainer";
@@ -42,7 +46,7 @@ QTesseract::QTesseract() :
 #endif
 }
 
-QString QTesseract::makeBoxes(const QImage &qImage, const int page){
+QString QTesseract::getBoxes(const QImage &qImage, const int page){
     PIX *pixs;
 
     if((pixs = qImage2PIX(qImage)) == NULL){
@@ -62,7 +66,54 @@ QString QTesseract::makeBoxes(const QImage &qImage, const int page){
 
     pixDestroy(&pixs);
     return QString::fromUtf8(text_out.string());
+}
 
+QString QTesseract::getUnicharset(const QVector<QString> &boxes){
+    int option;
+    UNICHARSET unicharset;
+
+    setlocale(LC_ALL, "");
+    unicharset.unichar_insert(" ");
+    
+    for(int i = 0; i < boxes.size(); i++){
+        TBOX box;
+        STRING unichar_string;
+        char buff[kBoxReadBufSize];
+        char *buffptr = buff;
+        QString boxStr = boxes[i];
+        QTextStream data(&boxStr);
+        data.setCodec("UTF-8");
+        QStringList lineBoxes = data.readAll().split(QRegExp("\n"), QString::SkipEmptyParts);
+        for(int j = 0; j < lineBoxes.size(); j++){
+            int page = 0;
+            QString line = lineBoxes.at(j);
+            buffptr = line.toUtf8().data();
+            const unsigned char *ubuf = reinterpret_cast<const unsigned char*>(buffptr);
+            if(ubuf[0] == 0xef && ubuf[1] == 0xbb && ubuf[2] == 0xbf)
+                buffptr++;
+            
+            while(*buffptr == ' ' || *buffptr == '\t')
+                buffptr++;
+
+            if(*buffptr != '\0'){
+                if(!ParseBoxFileStr(buffptr, &page, &unichar_string, &box)){
+                    continue;
+                }
+            }
+
+            unicharset.unichar_insert(unichar_string.string());
+            std::cout << "unichar = " << unichar_string.string() << std::endl;
+            //set_properties(&unicharset, unichar_string.string());
+        }
+    }
+
+    if(unicharset.save_to_file("hoge")){
+        std::cout << "success" << std::endl;
+    }else{
+        std::cout << "bad" << std::endl;
+    }
+
+    return QString("");
 }
 
 PIX* QTesseract::qImage2PIX(const QImage &qImage){
@@ -97,6 +148,10 @@ QImage QTesseract::PIX2qImage(PIX *pixImage){
 
 }
 
+void setProperties(UNICHARSET *unicharset, const char* const str){
+
+}
+
 void QTesseract::msg(QString text){
     QMessageBox msgBox;
     msgBox.setText(text);
@@ -107,3 +162,4 @@ QTesseract::~QTesseract(){
     m_api->End();
     delete m_api;
 }
+
