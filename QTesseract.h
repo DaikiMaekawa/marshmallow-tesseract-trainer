@@ -13,6 +13,7 @@ class QTesseract{
     static void msg(QString text);
     void setProperties(UNICHARSET *unicharset, const char* const str);
     //void readNextBox(QString boxData, STRING *str, TBOX *boundingBox);
+    void training();
 
 public:
     QTesseract();
