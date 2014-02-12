@@ -7,6 +7,26 @@
 #include <QImage>
 #include <QVector>
 
+struct FontProperties{
+    QString font;
+    bool italic;
+    bool bold;
+    bool fixed;
+    bool serif;
+    bool fraktur;
+    
+    FontProperties(const QString &fontName) : 
+        font(fontName),
+        italic(false),
+        bold(false),
+        fixed(false),
+        serif(false),
+        fraktur(false)
+    {
+
+    }
+};
+
 class QTesseract{
     tesseract::TessBaseAPI *m_api;
     QString m_lang;
@@ -17,8 +37,9 @@ class QTesseract{
 public:
     QTesseract();
     QString getBoxes(const QImage &qImage, const int page);
-    QString getUnicharset(const QVector<QString> &boxes);
+    void makeUnicharsetFile(const QString &boxFile, const int exp);
     void makeTrainingFile();
+    void makeFontPropertiesFile(const FontProperties &prop);
     static PIX* qImage2PIX(const QImage &qImage);
     static QImage PIX2qImage(PIX *pixImage);
     ~QTesseract();

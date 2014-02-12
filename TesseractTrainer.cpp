@@ -62,7 +62,7 @@ void TesseractTrainer::onLoadImage(){
     QVector<QString> boxes_list;
     boxes_list << boxes;
     m_tess.makeTrainingFile();
-    m_tess.getUnicharset(boxes_list);
+    m_tess.makeUnicharsetFile("hiragi", 0);
 }
 
 void TesseractTrainer::onSaveLang(){
