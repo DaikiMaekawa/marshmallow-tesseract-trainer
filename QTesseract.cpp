@@ -8,39 +8,6 @@
 
 static const char * const SETTING_ORGANIZATION_NAME = "marshmallow-tesseract-trainer";
 static const char * const SETTING_APP_NAME = "MarshmallowTesseractTrainer";
-static const char * const UNICHARSET_EXTRACTOR = "unicharset_extractor";
-
-void set_properties(UNICHARSET *unicharset, const char* const c_string) {
-#ifdef USING_WCTYPE
-    UNICHAR_ID id;
-    int wc;
-    id = unicharset->unichar_to_id(c_string);
-    unicharset->set_other_case(id, id);
-    int step = UNICHAR::utf8_step(c_string);
-    if (step == 0)
-        return; // Invalid utf-8.
-    
-    UNICHAR ch(c_string, step);
-    wc = ch.first_uni();
-    if (iswalpha(wc)) {
-        unicharset->set_isalpha(id, 1);
-        if (iswlower(wc)) {
-            unicharset->set_islower(id, 1);
-            unicharset->set_other_case(id, wc_to_unichar_id(*unicharset,towupper(wc)));
-        }
-        
-        if(iswupper(wc)) {
-            unicharset->set_isupper(id, 1);
-            unicharset->set_other_case(id, wc_to_unichar_id(*unicharset,towlower(wc)));
-        }
-    }
-    
-    if (iswdigit(wc))
-        unicharset->set_isdigit(id, 1);
-    if(iswpunct(wc))
-        unicharset->set_ispunctuation(id, 1);
-#endif
-}
 
 QTesseract::QTesseract() : 
     m_api(new tesseract::TessBaseAPI())
@@ -57,7 +24,7 @@ QTesseract::QTesseract() :
     }
 
     if(lang.isNull()){
-        msg("You need to configure tesseract in Settings!");
+        showMsg("You need to configure tesseract in Settings!");
     }
 
     setlocale(LC_NUMERIC, "C");
@@ -69,11 +36,11 @@ QTesseract::QTesseract() :
     //setenv("TESSDATA_PREFIX", datapath, 1);
 #if 0 //TODO: implemented
     if(m_api->Init(NULL, apiLang)){
-        msg("Could not initialize tesseract.\n");
+        showMsg("Could not initialize tesseract.\n");
     }
 #else
     if(m_api->Init(NULL, "eng")){
-        msg("Could not initialize tesseract.\n");
+        showMsg("Could not initialize tesseract.\n");
     } 
 #endif
 }
@@ -82,7 +49,7 @@ QString QTesseract::getBoxes(const QImage &qImage, const int page){
     PIX *pixs;
 
     if((pixs = qImage2PIX(qImage)) == NULL){
-        msg("Unsupported image type");
+        showMsg("Unsupported image type");
         return "";
     }
     
@@ -91,7 +58,7 @@ QString QTesseract::getBoxes(const QImage &qImage, const int page){
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     if(!m_api->ProcessPage(pixs, page, NULL, NULL, 0, &text_out)){
-        msg("Error during processing.\n");
+        showMsg("Error during processing.\n");
     }
 
     QApplication::restoreOverrideCursor();
@@ -102,18 +69,7 @@ QString QTesseract::getBoxes(const QImage &qImage, const int page){
 
 QString QTesseract::getUnicharset(const QVector<QString> &boxes){
 #if 1
-    QProcess extractor;
-    extractor.start(UNICHARSET_EXTRACTOR, QStringList() << "eng.hiragi.exp0.box");
-    if(!extractor.waitForStarted())
-        std::cout << "debug01" << std::endl;
-
-    extractor.write("Qt rocks!");
-    extractor.closeWriteChannel();
-
-    if(!extractor.waitForFinished())
-        std::cout << "debug02" << std::endl;
-
-    QByteArray ret = extractor.readAll();
+    runProcess("unicharset_extractor", QStringList() << "eng.hiragi.exp0.box");
 
 #else
     int option;
@@ -164,6 +120,11 @@ QString QTesseract::getUnicharset(const QVector<QString> &boxes){
     return QString(""); //TODO: Implemented
 }
 
+void QTesseract::makeTrainingFile(){
+    runProcess("tesseract", QStringList() << "eng.hiragi.exp0.png" 
+            << "eng.hiragi.exp0" << "nobatch" << "box.train.stderr");
+}
+
 PIX* QTesseract::qImage2PIX(const QImage &qImage){
     QImage qImg = qImage.rgbSwapped();
     const int wpl = qImg.bytesPerLine() / 4;
@@ -196,20 +157,25 @@ QImage QTesseract::PIX2qImage(PIX *pixImage){
 
 }
 
-void setProperties(UNICHARSET *unicharset, const char* const str){
-
-}
-
-void QTesseract::msg(QString text){
+void QTesseract::showMsg(const QString &text){
     QMessageBox msgBox;
     msgBox.setText(text);
     msgBox.exec();
 }
-/*
-void MasterTrainer* loadTrainingData(int argc, const char* const *argv, bool replication, ShapeTable **shapeTable, STRING *filePrefix){
 
+void QTesseract::runProcess(const QString &name, const QStringList &args){
+    QProcess proc;
+    proc.start(name, args);
+    if(!proc.waitForStarted())
+        std::cout << "debug01" << std::endl;
+
+    proc.write("Qt rocks!");
+    proc.closeWriteChannel();
+
+    if(!proc.waitForFinished())
+        std::cout << "debug02" << std::endl;
 }
-*/
+
 bool training(){
     /*
     int argc = 3;

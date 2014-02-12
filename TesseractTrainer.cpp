@@ -61,6 +61,7 @@ void TesseractTrainer::onLoadImage(){
     std::cout << boxes.toStdString() << std::endl;
     QVector<QString> boxes_list;
     boxes_list << boxes;
+    m_tess.makeTrainingFile();
     m_tess.getUnicharset(boxes_list);
 }
 
