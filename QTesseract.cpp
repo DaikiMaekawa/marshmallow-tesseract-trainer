@@ -78,6 +78,10 @@ void QTesseract::makeTrainingFile(){
             << "eng.hiragi.exp0" << "nobatch" << "box.train.stderr");
 }
 
+void QTesseract::makeFontPropertiesFile(const FontProperties &prop){
+
+}
+
 PIX* QTesseract::qImage2PIX(const QImage &qImage){
     QImage qImg = qImage.rgbSwapped();
     const int wpl = qImg.bytesPerLine() / 4;
