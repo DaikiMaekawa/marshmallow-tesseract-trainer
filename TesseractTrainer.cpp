@@ -34,6 +34,8 @@ void TesseractTrainer::connectSignals(){
     assert(ret);
     ret = connect(m_ui->actionSave, SIGNAL(triggered()), this, SLOT(onSaveLang()));
     assert(ret);
+    ret = connect(m_ui->pushTraining, SIGNAL(clicked()), this, SLOT(onPushTraining()));
+    assert(ret);
 }
 
 void TesseractTrainer::loadSettings(){
@@ -58,16 +60,17 @@ void TesseractTrainer::onLoadImage(){
     m_imgDir = file;
     QImage img(file);
     m_ui->labelImg->setPixmap(QPixmap::fromImage(img));
+}
 
-    QVector<TessChar> boxes = m_tess.getTessBoxes(file);
+void TesseractTrainer::onPushTraining(){
+    QVector<TessChar> boxes = m_tess.getTessBoxes(m_imgDir);
     FontProperties prop;
     prop.italic = m_ui->checkItalic->checkState();
     prop.bold = m_ui->checkBold->checkState();
     prop.fixed = m_ui->checkFixed->checkState();
     prop.serif = m_ui->checkSerif->checkState();
     prop.fraktur = m_ui->checkFraktur->checkState();
-    m_tess.training(file, prop);
-    
+    m_tess.training(m_imgDir, prop); 
 }
 
 void TesseractTrainer::onSaveLang(){

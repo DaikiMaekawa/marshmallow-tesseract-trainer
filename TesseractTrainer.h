@@ -28,6 +28,7 @@ private:
 public slots:
     void onLoadImage();
     void onSaveLang();
+    void onPushTraining();
 };
 
 #endif // TESSERACTTRAINER_H
