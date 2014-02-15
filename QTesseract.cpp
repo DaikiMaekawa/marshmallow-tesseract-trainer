@@ -4,16 +4,22 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <QProcess>
+#include <QFile>
+#include <QString>
 #include <iostream>
 
 static const char * const SETTING_ORGANIZATION_NAME = "marshmallow-tesseract-trainer";
 static const char * const SETTING_APP_NAME = "MarshmallowTesseractTrainer";
+static const char * const OUTPUT_DIR = "tessdata";
 
-QTesseract::QTesseract() : 
-    m_api(new tesseract::TessBaseAPI())
+QTesseract::QTesseract(const QString &lang, const QString &font) : 
+    m_api(new tesseract::TessBaseAPI()),
+    m_lang(lang),
+    m_font(font)
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope,
             SETTING_ORGANIZATION_NAME, SETTING_APP_NAME);
+    /*
     QString lang;
     if(settings.contains("Tesseract/Lang")){
         lang = settings.value("Tesseract/Lang").toString();
@@ -26,6 +32,7 @@ QTesseract::QTesseract() :
     if(lang.isNull()){
         showMsg("You need to configure tesseract in Settings!");
     }
+    */
 
     setlocale(LC_NUMERIC, "C");
     //QByteArray byteArray = lang.toAscii();
@@ -67,19 +74,34 @@ QString QTesseract::getBoxes(const QImage &qImage, const int page){
     return QString::fromUtf8(text_out.string());
 }
 
-void QTesseract::makeUnicharsetFile(const QString &boxFile, const int exp){
-    QStringList arg;
-    arg << QString("eng.%1.exp%2.box").arg(boxFile).arg(exp);
-    runProcess("unicharset_extractor", arg);
+void QTesseract::makeUnicharsetFile(const int exp){
+    QStringList args;
+    args << "-D" << OUTPUT_DIR << QString("%1/%2.%3.exp%4.box").arg(OUTPUT_DIR)
+                                                               .arg(m_lang)
+                                                               .arg(m_font)
+                                                               .arg(exp);
+    runProcess("unicharset_extractor", args);
 }
 
 void QTesseract::makeTrainingFile(){
-    runProcess("tesseract", QStringList() << "eng.hiragi.exp0.png" 
-            << "eng.hiragi.exp0" << "nobatch" << "box.train.stderr");
+    QString name = QString(OUTPUT_DIR) + QString("/%1.%2.exp0").arg(m_lang).arg(m_font);
+    QString img = name + QString(".png");
+
+    runProcess("tesseract", QStringList() << img
+            << name << "nobatch" << "box.train.stderr");
 }
 
 void QTesseract::makeFontPropertiesFile(const FontProperties &prop){
-
+    QFile file(QString(OUTPUT_DIR) + QString("/font_properties"));
+    if(file.open(QIODevice::WriteOnly)){
+        QString str = QString("%1 %2 %3 %4 %5 %6").arg(m_font)
+                                                  .arg(prop.italic)
+                                                  .arg(prop.bold)
+                                                  .arg(prop.fixed)
+                                                  .arg(prop.serif)
+                                                  .arg(prop.fraktur);
+        file.write(str.toLocal8Bit());
+    }
 }
 
 PIX* QTesseract::qImage2PIX(const QImage &qImage){
@@ -123,6 +145,8 @@ void QTesseract::showMsg(const QString &text){
 void QTesseract::runProcess(const QString &name, const QStringList &args){
     QProcess proc;
     proc.start(name, args);
+    std::cout << "runProcess: " << name.toStdString() << std::endl;
+    
     if(!proc.waitForStarted())
         std::cout << "debug01" << std::endl;
 
@@ -131,10 +155,33 @@ void QTesseract::runProcess(const QString &name, const QStringList &args){
 
     if(!proc.waitForFinished())
         std::cout << "debug02" << std::endl;
+
+    QByteArray ret = proc.readAll();
+    std::cout << ret.constData() << std::endl;
 }
 
-bool training(){
-    return true;
+void QTesseract::training(const FontProperties &prop){
+    makeTrainingFile();
+    makeUnicharsetFile(0);
+    makeFontPropertiesFile(prop);
+
+    QString tr = QString("%1/%2.%3.exp0.tr").arg(OUTPUT_DIR).arg(m_lang).arg(m_font);
+    QString font_properties = QString("%1/font_properties").arg(OUTPUT_DIR);
+    QString unicharset = QString("%1/unicharset").arg(OUTPUT_DIR);
+    
+    runProcess("mftraining", QStringList() << "-D" << OUTPUT_DIR
+                                           << "-F" << font_properties
+                                           << "-U" << unicharset
+                                           << tr);
+    
+    runProcess("mftraining", QStringList() << "-D" << OUTPUT_DIR
+                                           << "-F" << font_properties
+                                           << "-U" << unicharset
+                                           << "-O" << QString("%1.unicharset").arg(m_lang)
+                                           << "unicharset" << tr);
+
+    runProcess("cntraining", QStringList() << "-D" << OUTPUT_DIR << tr);
+    runProcess("combine_tessdata", QStringList() << QString("%1/%2.").arg(OUTPUT_DIR).arg(m_lang));
 }
 
 QTesseract::~QTesseract(){

@@ -8,15 +8,13 @@
 #include <QVector>
 
 struct FontProperties{
-    QString font;
     bool italic;
     bool bold;
     bool fixed;
     bool serif;
     bool fraktur;
     
-    FontProperties(const QString &fontName) : 
-        font(fontName),
+    FontProperties() : 
         italic(false),
         bold(false),
         fixed(false),
@@ -30,16 +28,17 @@ struct FontProperties{
 class QTesseract{
     tesseract::TessBaseAPI *m_api;
     QString m_lang;
+    QString m_font;
     static void showMsg(const QString &text);
     static void runProcess(const QString &name, const QStringList &args);
-    void training();
+    void makeUnicharsetFile(const int exp);
+    void makeTrainingFile();
+    void makeFontPropertiesFile(const FontProperties &prop); 
 
 public:
-    QTesseract();
+    QTesseract(const QString &lang, const QString &font);
     QString getBoxes(const QImage &qImage, const int page);
-    void makeUnicharsetFile(const QString &boxFile, const int exp);
-    void makeTrainingFile();
-    void makeFontPropertiesFile(const FontProperties &prop);
+    void training(const FontProperties &prop);
     static PIX* qImage2PIX(const QImage &qImage);
     static QImage PIX2qImage(PIX *pixImage);
     ~QTesseract();

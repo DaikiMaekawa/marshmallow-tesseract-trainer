@@ -20,7 +20,8 @@
 static const char * const SETTING_FILE_NAME = ".tesseracttrainerrc";
 TesseractTrainer::TesseractTrainer(int argc, char *argv[], QWidget *parent) :
     QMainWindow(parent),
-    m_ui(new Ui::TesseractTrainer)
+    m_ui(new Ui::TesseractTrainer),
+    m_tess("eng", "hiragi")
 {
     m_ui->setupUi(this);
     connectSignals();
@@ -57,12 +58,21 @@ void TesseractTrainer::onLoadImage(){
     m_imgDir = file;
     QImage img(file);
     m_ui->labelImg->setPixmap(QPixmap::fromImage(img));
+
+    FontProperties prop;
+    prop.bold = true;
+    m_tess.training(prop);
+
+    /*
     QString boxes = m_tess.getBoxes(img, 0);
     std::cout << boxes.toStdString() << std::endl;
-    QVector<QString> boxes_list;
-    boxes_list << boxes;
     m_tess.makeTrainingFile();
     m_tess.makeUnicharsetFile("hiragi", 0);
+    FontProperties prop("hiragi");
+    prop.bold = true;
+    m_tess.makeFontPropertiesFile(prop);
+    m_tess.training();
+    */
 }
 
 void TesseractTrainer::onSaveLang(){
