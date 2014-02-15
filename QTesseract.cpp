@@ -177,11 +177,23 @@ void QTesseract::training(const FontProperties &prop){
     runProcess("mftraining", QStringList() << "-D" << OUTPUT_DIR
                                            << "-F" << font_properties
                                            << "-U" << unicharset
-                                           << "-O" << QString("%1.unicharset").arg(m_lang)
-                                           << "unicharset" << tr);
+                                           << "-O" << QString("%1/%2.unicharset").arg(OUTPUT_DIR).arg(m_lang)
+                                           << QString("%1/unicharset").arg(OUTPUT_DIR) 
+                                           << tr);
 
     runProcess("cntraining", QStringList() << "-D" << OUTPUT_DIR << tr);
+    
+    runProcess("mv", QStringList() << QString("%1/inttemp").arg(OUTPUT_DIR)
+                                   << QString("%1/%2.inttemp").arg(OUTPUT_DIR).arg(m_lang));
+    runProcess("mv", QStringList() << QString("%1/shapetable").arg(OUTPUT_DIR)
+                                   << QString("%1/%2.shapetable").arg(OUTPUT_DIR).arg(m_lang));
+    runProcess("mv", QStringList() << QString("%1/pffmtable").arg(OUTPUT_DIR)
+                                   << QString("%1/%2.pffmtable").arg(OUTPUT_DIR).arg(m_lang));
+    runProcess("mv", QStringList() << QString("%1/normproto").arg(OUTPUT_DIR)
+                                   << QString("%1/%2.normproto").arg(OUTPUT_DIR).arg(m_lang));
+
     runProcess("combine_tessdata", QStringList() << QString("%1/%2.").arg(OUTPUT_DIR).arg(m_lang));
+
 }
 
 QTesseract::~QTesseract(){
