@@ -10,7 +10,8 @@
 
 static const char * const SETTING_ORGANIZATION_NAME = "marshmallow-tesseract-trainer";
 static const char * const SETTING_APP_NAME = "MarshmallowTesseractTrainer";
-static const char * const OUTPUT_DIR = "tessdata";
+//static const char * const OUTPUT_DIR = "tessdata";
+//static const char * const OUTPUT_DIR = ".";
 
 QTesseract::QTesseract(const QString &lang, const QString &font) : 
     m_api(new tesseract::TessBaseAPI()),
@@ -75,24 +76,28 @@ QString QTesseract::getBoxes(const QImage &qImage, const int page){
 }
 
 void QTesseract::makeUnicharsetFile(const int exp){
+    /*
     QStringList args;
     args << "-D" << OUTPUT_DIR << QString("%1/%2.%3.exp%4.box").arg(OUTPUT_DIR)
                                                                .arg(m_lang)
                                                                .arg(m_font)
                                                                .arg(exp);
     runProcess("unicharset_extractor", args);
+    */
 }
 
 void QTesseract::makeTrainingFile(){
+    /*
     QString name = QString(OUTPUT_DIR) + QString("/%1.%2.exp0").arg(m_lang).arg(m_font);
     QString img = name + QString(".png");
 
     runProcess("tesseract", QStringList() << img
             << name << "nobatch" << "box.train.stderr");
+    */
 }
 
 void QTesseract::makeFontPropertiesFile(const FontProperties &prop){
-    QFile file(QString(OUTPUT_DIR) + QString("/font_properties"));
+    QFile file(QString("font_properties"));
     if(file.open(QIODevice::WriteOnly)){
         QString str = QString("%1 %2 %3 %4 %5 %6").arg(m_font)
                                                   .arg(prop.italic)
@@ -160,8 +165,26 @@ void QTesseract::runProcess(const QString &name, const QStringList &args){
     std::cout << ret.constData() << std::endl;
 }
 
-void QTesseract::training(const FontProperties &prop){
-    makeTrainingFile();
+void QTesseract::training(const QString &img, const FontProperties &prop){
+#if 0
+    //runProcess("ln", QStringList() << "-s" << img << OUTPUT_DIR);
+
+    runProcess("tesseract", QStringList() << img
+                                          << QString("%1.%2.exp0").arg(m_lang).arg(m_font)
+                                          << "-l" << m_lang
+                                          << "batch.nochop" << "makebox");
+    
+    runProcess("mv", QStringList() << QString("%1.%2.exp0.box").arg(m_lang).arg(m_font)
+                                   << OUTPUT_DIR);
+    
+    QString name = QString(OUTPUT_DIR) + QString("/%1.%2.exp0").arg(m_lang).arg(m_font);
+    
+    QString lnImg = QString("%1/%2").arg(OUTPUT_DIR).arg(img);
+    runProcess("tesseract", QStringList() << lnImg
+                                          << name 
+                                          << "nobatch" << "box.train.stderr"); 
+
+    //makeTrainingFile();
     makeUnicharsetFile(0);
     makeFontPropertiesFile(prop);
 
@@ -193,6 +216,47 @@ void QTesseract::training(const FontProperties &prop){
                                    << QString("%1/%2.normproto").arg(OUTPUT_DIR).arg(m_lang));
 
     runProcess("combine_tessdata", QStringList() << QString("%1/%2.").arg(OUTPUT_DIR).arg(m_lang));
+#else
+    runProcess("tesseract", QStringList() << img
+                                          << QString("%1.%2.exp0").arg(m_lang).arg(m_font)
+                                          << "-l" << m_lang
+                                          << "batch.nochop" << "makebox");
+    
+    QString name = QString("%1.%2.exp0").arg(m_lang).arg(m_font);
+    runProcess("tesseract", QStringList() << img
+                                          << name 
+                                          << "nobatch" << "box.train.stderr"); 
+    
+    runProcess("unicharset_extractor", QStringList() << QString("%1.%2.exp0.box").arg(m_lang).arg(m_font));
+    makeFontPropertiesFile(prop);
+
+    QString tr = QString("%1.%2.exp0.tr").arg(m_lang).arg(m_font);
+    QString font_properties = QString("font_properties");
+    QString unicharset = QString("unicharset");
+    
+    runProcess("mftraining", QStringList() << "-F" << font_properties
+                                           << "-U" << unicharset
+                                           << tr);
+    
+    runProcess("mftraining", QStringList() << "-F" << font_properties
+                                           << "-U" << unicharset
+                                           << "-O" << QString("%1.unicharset").arg(m_lang)
+                                           << QString("unicharset")
+                                           << tr);
+
+    runProcess("cntraining", QStringList() << tr);
+    
+    runProcess("mv", QStringList() << QString("inttemp")
+                                   << QString("%1.inttemp").arg(m_lang));
+    runProcess("mv", QStringList() << QString("shapetable")
+                                   << QString("%1.shapetable").arg(m_lang));
+    runProcess("mv", QStringList() << QString("pffmtable")
+                                   << QString("%1.pffmtable").arg(m_lang));
+    runProcess("mv", QStringList() << QString("normproto")
+                                   << QString("%1.normproto").arg(m_lang));
+
+    runProcess("combine_tessdata", QStringList() << QString("%1.").arg(m_lang)); 
+#endif
 
 }
 

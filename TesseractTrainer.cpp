@@ -61,7 +61,7 @@ void TesseractTrainer::onLoadImage(){
 
     FontProperties prop;
     prop.bold = true;
-    m_tess.training(prop);
+    m_tess.training(file, prop);
 
     /*
     QString boxes = m_tess.getBoxes(img, 0);

@@ -38,7 +38,7 @@ class QTesseract{
 public:
     QTesseract(const QString &lang, const QString &font);
     QString getBoxes(const QImage &qImage, const int page);
-    void training(const FontProperties &prop);
+    void training(const QString &img, const FontProperties &prop);
     static PIX* qImage2PIX(const QImage &qImage);
     static QImage PIX2qImage(PIX *pixImage);
     ~QTesseract();
