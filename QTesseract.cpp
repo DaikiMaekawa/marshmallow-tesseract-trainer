@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QString>
 #include <iostream>
+//#include <fstream>
 
 static const char * const SETTING_ORGANIZATION_NAME = "marshmallow-tesseract-trainer";
 static const char * const SETTING_APP_NAME = "MarshmallowTesseractTrainer";
@@ -53,6 +54,35 @@ QTesseract::QTesseract(const QString &lang, const QString &font) :
 #endif
 }
 
+QVector<TessChar> QTesseract::getTessBoxes(const QString &img){
+    QString box = QString("%1.%2.exp0").arg(m_lang).arg(m_font);
+    runProcess("tesseract", QStringList() << img
+                                          << box
+                                          << "-l" << m_lang
+                                          << "batch.nochop" << "makebox"); 
+    QVector<TessChar> boxes;
+    QFile file(box + QString(".box"));
+    if(file.open(QIODevice::ReadOnly)){
+        QTextStream in(&file);
+        QString line;
+        do{
+            line = in.readLine();
+            std::cout << line.toStdString() << std::endl;
+        }while(!line.isNull());
+        /*
+        while(!file.atEnd()){
+            TessChar c;
+            QTextStream in(&file);
+            in >> c.type >> c.leftX >> c.leftY >> c.rightX >> c.rightY;
+            std::cout << c.type << std::endl;
+            //boxes << c;
+        }
+        */
+    }
+
+    return boxes;
+}
+/*
 QString QTesseract::getBoxes(const QImage &qImage, const int page){
     PIX *pixs;
 
@@ -74,6 +104,7 @@ QString QTesseract::getBoxes(const QImage &qImage, const int page){
     pixDestroy(&pixs);
     return QString::fromUtf8(text_out.string());
 }
+*/
 
 void QTesseract::makeUnicharsetFile(const int exp){
     /*

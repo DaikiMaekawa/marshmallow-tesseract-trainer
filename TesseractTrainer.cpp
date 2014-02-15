@@ -59,9 +59,12 @@ void TesseractTrainer::onLoadImage(){
     QImage img(file);
     m_ui->labelImg->setPixmap(QPixmap::fromImage(img));
 
+    QVector<TessChar> boxes = m_tess.getTessBoxes(file);
+    /*
     FontProperties prop;
     prop.bold = true;
     m_tess.training(file, prop);
+    */
 
     /*
     QString boxes = m_tess.getBoxes(img, 0);
