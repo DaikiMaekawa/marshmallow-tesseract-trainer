@@ -69,29 +69,6 @@ QVector<TessChar> QTesseract::getTessBoxes(const QString &img){
 
     return boxes;
 }
-/*
-QString QTesseract::getBoxes(const QImage &qImage, const int page){
-    PIX *pixs;
-
-    if((pixs = qImage2PIX(qImage)) == NULL){
-        showMsg("Unsupported image type");
-        return "";
-    }
-    
-    m_api->SetVariable("tessedit_create_boxfile", "1");
-    STRING text_out;
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
-    if(!m_api->ProcessPage(pixs, page, NULL, NULL, 0, &text_out)){
-        showMsg("Error during processing.\n");
-    }
-
-    QApplication::restoreOverrideCursor();
-
-    pixDestroy(&pixs);
-    return QString::fromUtf8(text_out.string());
-}
-*/
 
 void QTesseract::makeUnicharsetFile(const int exp){
     /*
