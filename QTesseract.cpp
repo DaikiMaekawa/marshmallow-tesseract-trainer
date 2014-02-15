@@ -145,16 +145,16 @@ void QTesseract::showMsg(const QString &text){
 void QTesseract::runProcess(const QString &name, const QStringList &args){
     QProcess proc;
     proc.start(name, args);
-    std::cout << "runProcess: " << name.toStdString() << std::endl;
+    std::cout << "run process: " << name.toStdString() << std::endl;
     
     if(!proc.waitForStarted())
-        std::cout << "debug01" << std::endl;
+        std::cout << "start failed" << std::endl;
 
     proc.write("Qt rocks!");
     proc.closeWriteChannel();
 
     if(!proc.waitForFinished())
-        std::cout << "debug02" << std::endl;
+        std::cout << "finish failed" << std::endl;
 
     QByteArray ret = proc.readAll();
     std::cout << ret.constData() << std::endl;
