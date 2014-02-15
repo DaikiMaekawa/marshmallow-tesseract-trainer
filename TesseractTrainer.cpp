@@ -60,22 +60,14 @@ void TesseractTrainer::onLoadImage(){
     m_ui->labelImg->setPixmap(QPixmap::fromImage(img));
 
     QVector<TessChar> boxes = m_tess.getTessBoxes(file);
-    /*
     FontProperties prop;
-    prop.bold = true;
+    prop.italic = m_ui->checkItalic->checkState();
+    prop.bold = m_ui->checkBold->checkState();
+    prop.fixed = m_ui->checkFixed->checkState();
+    prop.serif = m_ui->checkSerif->checkState();
+    prop.fraktur = m_ui->checkFraktur->checkState();
     m_tess.training(file, prop);
-    */
-
-    /*
-    QString boxes = m_tess.getBoxes(img, 0);
-    std::cout << boxes.toStdString() << std::endl;
-    m_tess.makeTrainingFile();
-    m_tess.makeUnicharsetFile("hiragi", 0);
-    FontProperties prop("hiragi");
-    prop.bold = true;
-    m_tess.makeFontPropertiesFile(prop);
-    m_tess.training();
-    */
+    
 }
 
 void TesseractTrainer::onSaveLang(){
