@@ -39,7 +39,6 @@ class QTesseract{
     QString m_font;
     static void showMsg(const QString &text);
     static void runProcess(const QString &name, const QStringList &args);
-    void makeUnicharsetFile(const int exp);
     void makeTrainingFile();
     void makeFontPropertiesFile(const FontProperties &prop); 
 

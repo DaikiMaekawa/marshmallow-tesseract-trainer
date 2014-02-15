@@ -70,17 +70,6 @@ QVector<TessChar> QTesseract::getTessBoxes(const QString &img){
     return boxes;
 }
 
-void QTesseract::makeUnicharsetFile(const int exp){
-    /*
-    QStringList args;
-    args << "-D" << OUTPUT_DIR << QString("%1/%2.%3.exp%4.box").arg(OUTPUT_DIR)
-                                                               .arg(m_lang)
-                                                               .arg(m_font)
-                                                               .arg(exp);
-    runProcess("unicharset_extractor", args);
-    */
-}
-
 void QTesseract::makeTrainingFile(){
     /*
     QString name = QString(OUTPUT_DIR) + QString("/%1.%2.exp0").arg(m_lang).arg(m_font);
