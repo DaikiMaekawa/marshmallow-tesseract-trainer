@@ -21,21 +21,6 @@ QTesseract::QTesseract(const QString &lang, const QString &font) :
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope,
             SETTING_ORGANIZATION_NAME, SETTING_APP_NAME);
-    /*
-    QString lang;
-    if(settings.contains("Tesseract/Lang")){
-        lang = settings.value("Tesseract/Lang").toString();
-    }
-    QString dataPath;
-    if(settings.contains("Tesseract/DataPath")){
-        dataPath = settings.value("Tesseract/DataPath").toString();
-    }
-
-    if(lang.isNull()){
-        showMsg("You need to configure tesseract in Settings!");
-    }
-    */
-
     setlocale(LC_NUMERIC, "C");
     //QByteArray byteArray = lang.toAscii();
     //const char *apiLang = byteArray.constData();
@@ -287,10 +272,9 @@ void QTesseract::training(const QString &img, const FontProperties &prop){
                                    << QString("%1.pffmtable").arg(m_lang));
     runProcess("mv", QStringList() << QString("normproto")
                                    << QString("%1.normproto").arg(m_lang));
-
+    
     runProcess("combine_tessdata", QStringList() << QString("%1.").arg(m_lang)); 
-#endif
-
+#endif 
 }
 
 QTesseract::~QTesseract(){
