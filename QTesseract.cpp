@@ -65,19 +65,21 @@ QVector<TessChar> QTesseract::getTessBoxes(const QString &img){
     if(file.open(QIODevice::ReadOnly)){
         QTextStream in(&file);
         QString line;
-        do{
-            line = in.readLine();
-            std::cout << line.toStdString() << std::endl;
-        }while(!line.isNull());
-        /*
-        while(!file.atEnd()){
+        while(true){
             TessChar c;
-            QTextStream in(&file);
-            in >> c.type >> c.leftX >> c.leftY >> c.rightX >> c.rightY;
-            std::cout << c.type << std::endl;
-            //boxes << c;
+            line = in.readLine();
+            if(!line.isNull()){
+                QStringList list = line.split(" ");
+                c.type = list[0];
+                c.leftX = list[1].toInt();
+                c.leftY = list[2].toInt();
+                c.rightX = list[3].toInt();
+                c.rightY = list[4].toInt();
+                std::cout << c.type.toStdString() << std::endl;
+            }else{
+                break;
+            }
         }
-        */
     }
 
     return boxes;

@@ -8,7 +8,7 @@
 #include <QVector>
 
 struct TessChar{
-    char type;
+    QString type;
     int leftX;
     int leftY;
     int rightX;
