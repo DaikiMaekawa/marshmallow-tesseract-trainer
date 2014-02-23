@@ -150,64 +150,20 @@ void QTesseract::runProcess(const QString &name, const QStringList &args){
 }
 
 void QTesseract::training(const QString &img, const FontProperties &prop){
-#if 0
-    //runProcess("ln", QStringList() << "-s" << img << OUTPUT_DIR);
-
-    runProcess("tesseract", QStringList() << img
-                                          << QString("%1.%2.exp0").arg(m_lang).arg(m_font)
-                                          << "-l" << m_lang
-                                          << "batch.nochop" << "makebox");
-    
-    runProcess("mv", QStringList() << QString("%1.%2.exp0.box").arg(m_lang).arg(m_font)
-                                   << OUTPUT_DIR);
-    
-    QString name = QString(OUTPUT_DIR) + QString("/%1.%2.exp0").arg(m_lang).arg(m_font);
-    
-    QString lnImg = QString("%1/%2").arg(OUTPUT_DIR).arg(img);
-    runProcess("tesseract", QStringList() << lnImg
-                                          << name 
-                                          << "nobatch" << "box.train.stderr"); 
-
-    //makeTrainingFile();
-    makeUnicharsetFile(0);
-    makeFontPropertiesFile(prop);
-
-    QString tr = QString("%1/%2.%3.exp0.tr").arg(OUTPUT_DIR).arg(m_lang).arg(m_font);
-    QString font_properties = QString("%1/font_properties").arg(OUTPUT_DIR);
-    QString unicharset = QString("%1/unicharset").arg(OUTPUT_DIR);
-    
-    runProcess("mftraining", QStringList() << "-D" << OUTPUT_DIR
-                                           << "-F" << font_properties
-                                           << "-U" << unicharset
-                                           << tr);
-    
-    runProcess("mftraining", QStringList() << "-D" << OUTPUT_DIR
-                                           << "-F" << font_properties
-                                           << "-U" << unicharset
-                                           << "-O" << QString("%1/%2.unicharset").arg(OUTPUT_DIR).arg(m_lang)
-                                           << QString("%1/unicharset").arg(OUTPUT_DIR) 
-                                           << tr);
-
-    runProcess("cntraining", QStringList() << "-D" << OUTPUT_DIR << tr);
-    
-    runProcess("mv", QStringList() << QString("%1/inttemp").arg(OUTPUT_DIR)
-                                   << QString("%1/%2.inttemp").arg(OUTPUT_DIR).arg(m_lang));
-    runProcess("mv", QStringList() << QString("%1/shapetable").arg(OUTPUT_DIR)
-                                   << QString("%1/%2.shapetable").arg(OUTPUT_DIR).arg(m_lang));
-    runProcess("mv", QStringList() << QString("%1/pffmtable").arg(OUTPUT_DIR)
-                                   << QString("%1/%2.pffmtable").arg(OUTPUT_DIR).arg(m_lang));
-    runProcess("mv", QStringList() << QString("%1/normproto").arg(OUTPUT_DIR)
-                                   << QString("%1/%2.normproto").arg(OUTPUT_DIR).arg(m_lang));
-
-    runProcess("combine_tessdata", QStringList() << QString("%1/%2.").arg(OUTPUT_DIR).arg(m_lang));
-#else
     runProcess("tesseract", QStringList() << img
                                           << QString("%1.%2.exp0").arg(m_lang).arg(m_font)
                                           << "-l" << m_lang
                                           << "batch.nochop" << "makebox");
     
     QString name = QString("%1.%2.exp0").arg(m_lang).arg(m_font);
-    runProcess("tesseract", QStringList() << img
+    QString lnImg = img;
+    lnImg.replace(0, lnImg.lastIndexOf("."), name);
+    std::cout << lnImg.toStdString() << std::endl;
+
+    runProcess("ln", QStringList() << "-s" << img
+                                   << lnImg);
+
+    runProcess("tesseract", QStringList() << lnImg
                                           << name 
                                           << "nobatch" << "box.train.stderr"); 
     
@@ -240,7 +196,6 @@ void QTesseract::training(const QString &img, const FontProperties &prop){
                                    << QString("%1.normproto").arg(m_lang));
     
     runProcess("combine_tessdata", QStringList() << QString("%1.").arg(m_lang)); 
-#endif 
 }
 
 QTesseract::~QTesseract(){
